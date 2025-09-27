@@ -14,7 +14,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,9 +29,8 @@ class Controller {
     @PostConstruct
     void initNovels() {
         model = new RiMarkov(5);
-        List<String> filenames = List.of("Oliver_Twist.txt", "David_Copperfield.txt");
+        List<String> filenames = List.of("The_Gift_of_the_Magi.txt", "Christmas_Carol.txt");
         long startTime = System.currentTimeMillis();
-
         try {
             for (String filename : filenames) {
                 model.addText(readText(filename));
@@ -74,9 +72,7 @@ class Controller {
 
     String generateResponse(int numLines) {
         StringBuilder response = new StringBuilder();
-        Arrays.stream(model.generate(numLines, Map.of(
-                "minLength", 15, "temperature", 100f, "allowDuplicates", false)))
-                .forEach(line -> response.append("<p>").append(line).append("</p>"));
+        Arrays.stream(model.generate()).forEach(line -> response.append("<p>").append(line).append("</p>"));
         return response.toString();
     }
 
