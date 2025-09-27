@@ -17,6 +17,10 @@
 
 # # Sets the maximum heap size for the resulting native binary, tested by running the application locally with VM option -Xms.
 -R:MaxHeapSize=48m
+
+# -O1: Trades performance for reduced file size and build time.
+-O1
+
 # Enables aggressive optimization during compilation. This is the highest optimization level and may improve performance, though it can increase build time and binary size.
 -O3
 
