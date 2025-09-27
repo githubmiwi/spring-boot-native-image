@@ -7,7 +7,7 @@ plugins {
 
 group = 'sample'
 description = 'spring-boot-native-image'
-version = '0.3.0'
+version = '0.4.0'
 
 bootBuildImage {
     environment = [
@@ -18,7 +18,9 @@ bootBuildImage {
                     "--strict-image-heap",
                     "-march=native",
                     "-R:MinHeapSize=32m",
-                    "-R:MaxHeapSize=48m"
+                    "-R:MaxHeapSize=48m",
+                    "-O3" // best performance at the cost of longer build times
+                    //'-J-Xmx2G'
             ].join(' '),
             "BP_BINARY_COMPRESSION_METHOD": "upx",
             "BP_JVM_VERSION" : "21"
