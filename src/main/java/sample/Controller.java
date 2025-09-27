@@ -1,0 +1,83 @@
+package sample;
+
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import rita.RiMarkov;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Slf4j
+@RestController
+class Controller {
+
+    private final static String COMMENT = "***";
+    private final static String START_MARKER = "START";
+    private final static String END_MARKER = "END";
+
+    private RiMarkov model;
+
+    @PostConstruct
+    void initNovels() {
+        model = new RiMarkov(5);
+        List<String> filenames = List.of("Oliver_Twist.txt", "David_Copperfield.txt");
+        long startTime = System.currentTimeMillis();
+
+        try {
+            for (String filename : filenames) {
+                model.addText(readText(filename));
+                readText(filename);
+            }
+        } catch (IOException | RuntimeException ex) {
+            log.error(ex.getMessage(), ex);
+        }
+        log.info("Time taken to initialize: {}ms", System.currentTimeMillis() - startTime);
+    }
+
+    String readText(String novel) throws IOException {
+        try (BufferedReader in = createInputStreamReader(novel)) {
+            return in.lines()
+                    .dropWhile(line -> !(line.startsWith(COMMENT) && line.contains(START_MARKER)))
+                    .takeWhile(line -> !(line.startsWith(COMMENT) && line.contains(END_MARKER)))
+                    .filter(line -> !line.startsWith(COMMENT))
+                    .collect(Collectors.joining(" "));
+        }
+    }
+
+    BufferedReader createInputStreamReader(String novel) throws IOException {
+        return new BufferedReader(new InputStreamReader(
+                new ClassPathResource(novel, Controller.class.getClassLoader()).getInputStream(),
+                StandardCharsets.UTF_8));
+    }
+
+    @RequestMapping(value = "/")
+    ResponseEntity<String> respond() {
+        return ResponseEntity.ok(generateResponse());
+    }
+
+    String generateResponse() {
+        long startTime = System.currentTimeMillis();
+        String response = generateResponse(3);
+        log.info("Time taken to respond: {}ms", System.currentTimeMillis() - startTime);
+        return response;
+    }
+
+    String generateResponse(int numLines) {
+        StringBuilder response = new StringBuilder();
+        Arrays.stream(model.generate(numLines, Map.of(
+                "minLength", 15, "temperature", 100f, "allowDuplicates", false)))
+                .forEach(line -> response.append("<p>").append(line).append("</p>"));
+        return response.toString();
+    }
+
+}
