@@ -7,21 +7,30 @@ plugins {
 
 group = 'sample'
 description = 'spring-boot-native-image'
-version = '0.5.0'
+version = 'latest'
 
 bootBuildImage {
     environment = [
+            // https://github.com/paketo-buildpacks/native-image
             "BP_NATIVE_IMAGE" : "true",
             "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": [
+                    // (default) mostly-static linked executable
                     "-H:+StaticExecutableWithDynamicLibC",
+                    // no fallback if native-image generation fails
                     "--no-fallback",
+                    // stricter heap usage rules during build
                     "--strict-image-heap",
+                    // optimize for host machine
                     "-march=native",
+                    // Parallel GC: Garbage-First (G1) GC based on Java HotSpot VM
+                    "--gc=parallel",
+                    // min heap size for binary, tested by locally with VM option -Xms
                     "-R:MinHeapSize=32m",
+                    // max heap size for binary, tested by locally with VM option -Xmx
                     "-R:MaxHeapSize=48m",
-                    "-O1"
-                    //'-J-Xmx2G'
-            ].join(' '),
+                    // -O2: (default) good performance and file size
+                    "-O2"
+            ].join(" "),
             "BP_BINARY_COMPRESSION_METHOD": "upx",
             "BP_JVM_VERSION" : "21"
     ]
