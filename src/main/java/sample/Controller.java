@@ -20,14 +20,14 @@ import java.util.stream.Collectors;
 @RestController
 class Controller {
 
-    private final static String COMMENT = "***";
-    private final static String START_MARKER = "START";
-    private final static String END_MARKER = "END";
+    private static final String COMMENT = "***";
+    private static final String START_MARKER = "START";
+    private static final String END_MARKER = "END";
 
     private RiMarkov model;
 
     @PostConstruct
-    void initNovels() {
+    void initModel() {
         model = new RiMarkov(5);
         List<String> filenames = List.of("The_Gift_of_the_Magi.txt", "Christmas_Carol.txt");
         long startTime = System.currentTimeMillis();
@@ -42,8 +42,8 @@ class Controller {
         log.info("Time taken to initialize: {}ms", System.currentTimeMillis() - startTime);
     }
 
-    String readText(String novel) throws IOException {
-        try (BufferedReader in = createInputStreamReader(novel)) {
+    String readText(String inputFilename) throws IOException {
+        try (BufferedReader in = createInputStreamReader(inputFilename)) {
             return in.lines()
                     .dropWhile(line -> !(line.startsWith(COMMENT) && line.contains(START_MARKER)))
                     .takeWhile(line -> !(line.startsWith(COMMENT) && line.contains(END_MARKER)))
@@ -52,25 +52,25 @@ class Controller {
         }
     }
 
-    BufferedReader createInputStreamReader(String novel) throws IOException {
+    BufferedReader createInputStreamReader(String inputFilename) throws IOException {
         return new BufferedReader(new InputStreamReader(
-                new ClassPathResource(novel, Controller.class.getClassLoader()).getInputStream(),
+                new ClassPathResource(inputFilename, getClass().getClassLoader()).getInputStream(),
                 StandardCharsets.UTF_8));
     }
 
     @RequestMapping(value = "/")
     ResponseEntity<String> respond() {
-        return ResponseEntity.ok(generateResponse());
+        return ResponseEntity.ok(measureResponse());
     }
 
-    String generateResponse() {
+    String measureResponse() {
         long startTime = System.currentTimeMillis();
-        String response = generateResponse(3);
+        String response = generateResponse();
         log.info("Time taken to respond: {}ms", System.currentTimeMillis() - startTime);
         return response;
     }
 
-    String generateResponse(int numLines) {
+    String generateResponse() {
         StringBuilder response = new StringBuilder();
         Arrays.stream(model.generate()).forEach(line -> response.append("<p>").append(line).append("</p>"));
         return response.toString();
