@@ -11,10 +11,7 @@ version = 'latest-25'
 
 bootBuildImage {
     environment = [
-            //"SOURCE_DATE_EPOCH": "${System.currentTimeMillis() / 1000 as long}",
             "BP_JVM_VERSION" : "25",
-            //"JAVA_TOOL_OPTIONS": "",
-            // https://github.com/paketo-buildpacks/native-image
             "BP_NATIVE_IMAGE" : "true",
             "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": [
                     // (default) mostly-static linked executable
@@ -35,12 +32,7 @@ bootBuildImage {
     ]
     builder = "paketobuildpacks/builder-jammy-buildpackless-tiny"
     buildpacks = [
-            "paketobuildpacks/upx:3.8.3",
-            "paketobuildpacks/bellsoft-liberica:11.4.0",
-            "paketobuildpacks/syft:2.21.0",
-            "paketobuildpacks/executable-jar:6.13.3",
-            "paketobuildpacks/spring-boot:5.33.4",
-            "paketobuildpacks/java-native-image:12.0.0"
+            "paketobuildpacks/java-native-image"
     ]
     runImage = "busybox:1.36.1-glibc"
     buildCache {
@@ -58,9 +50,6 @@ bootBuildImage {
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
-    /*toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
-    }*/
 }
 
 configurations {

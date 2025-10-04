@@ -1,6 +1,64 @@
 
 # 📊 Spring Boot - Native Images 
 
+### Gradle Task bootBuildImage for Native Images
+It is easy to configure native image creations in Gradle:
+
+#### bootBuildImage - simple way
+
+    bootBuildImage {  
+        environment = [
+            "BP_NATIVE_IMAGE": "true",
+        ]  
+        builder = "paketobuildpacks/builder-jammy-buildpackless-tiny"
+        buildpacks = [
+            "paketobuildpacks/java-native-image"  
+        ]
+    }
+
+
+#### bootBuildImage - including optimizations
+But with explicit settings of environment build arguments, upx compression, another run image it is possible to get significant better results regarding build time, image size, startup time and memory consumptions during runtime.
+
+    bootBuildImage {  
+        environment = [  
+            "BP_JVM_VERSION": "25",
+            "BP_NATIVE_IMAGE": "true",
+            "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": [
+                // (default) mostly-static linked executable  
+                "-H:+UnlockExperimentalVMOptions -H:+StaticExecutableWithDynamicLibC",
+                // no fallback if native-image generation fails
+                "--no-fallback",
+                // optimize for host machine 
+                "-march=native",
+                // Parallel GC: Garbage-First (G1) GC based on Java HotSpot VM  
+                "--gc=parallel",
+                // min/max heap size for binary, tested by locally with VM options -Xms -Xmx
+                "-R:MinHeapSize=32m -R:MaxHeapSize=48m",  
+                // -Os: optimizations except those that can increase code or image size significantly  
+                "-Os"  
+            ].join(" "),
+            "BP_BINARY_COMPRESSION_METHOD": "upx",  
+            "BP_RUNTIME_CERT_BINDING_DISABLED": "true"
+        ]  
+        builder = "paketobuildpacks/builder-jammy-buildpackless-tiny"  
+        buildpacks = [
+            "paketobuildpacks/java-native-image"  
+        ]  
+        runImage = "busybox:1.36.1-glibc"  
+        buildCache {  
+            bind {
+                source.set("/tmp/paketobuildpacks/cache-${rootProject.name}.build")  
+            }  
+        }  
+        launchCache {  
+            bind {  
+                source.set("/tmp/paketobuildpacks/cache-${rootProject.name}.launch")  
+            }
+        }
+    }
+
+
 ## Test Results GraalVM 21
 | bootBuildImage native-image                                 | + upx compression<br> + busybox runtime<br> + defaults                                                          | + upx compression<br> + busybox runtime<br> + mem optimizations<br> + default optimizations<br> + parallel gc                                          |
 |-------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
