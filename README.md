@@ -57,9 +57,30 @@ docker run --rm --memory=116m --memory-swap=0 --name "spring-boot-native-image" 
 ```
 
 ## References
-* [Spring Boot Packaging OCI Images](https://docs.spring.io/spring-boot/gradle-plugin/packaging-oci-image.html)
-* [Paketo Buildpacks Java How To](https://paketo.io/docs/howto/java/)
-* [Paketo Buildpack for Native Image](https://github.com/paketo-buildpacks/native-image)
-* [Pack CLI](https://buildpacks.io/docs/for-platform-operators/how-to/integrate-ci/pack/)
+
+### Oracle GraalVM
 * [GraalVM Manual](https://www.graalvm.org/latest/reference-manual/)
 * [GraalVM - Native Image Build Output](https://github.com/oracle/graal/blob/master/docs/reference-manual/native-image/BuildOutput.md)
+* [SBOM  (Software Bill Of Materials) provided in Native Images](https://github.com/oracle/graal/blob/master/docs/security/SBOM.md)
+* [GraalVM Community Edition Container Images](https://docs.oracle.com/en/graalvm/jdk/25/docs/docs/getting-started/container-images)
+* [Medium - GraalVM News](https://medium.com/graalvm)
+
+### Paketo Buildpacks
+* [Paketo Buildpacks Java How To](https://paketo.io/docs/howto/java/)
+* [Paketo Buildpacks for GraalVM](https://github.com/paketo-buildpacks/graalvm)
+* [Paketo Buildpack for Native Image](https://github.com/paketo-buildpacks/native-image)
+* [Buildpacks IO - Pack CLI Tool](https://buildpacks.io/docs/for-platform-operators/how-to/integrate-ci/pack/)
+
+### Tiny Container Images
+* [UPX - the Ultimate Packer for eXecutables ](https://upx.github.io/)
+* [Busybox - The Swiss Army Knife of Embedded Linux](https://hub.docker.com/_/busybox)
+
+### Gradle Support for Native Images
+* [GraalVM Gradle Plugin for GraalVM Native Image](https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html)
+* [Spring Boot Packaging OCI Images](https://docs.spring.io/spring-boot/gradle-plugin/packaging-oci-image.html)
+* [GraalVM Gradle Plugin provides reachability metadata](https://www.graalvm.org/latest/reference-manual/native-image/guides/use-reachability-metadata-repository-gradle/)
+
+### Sample Projects
+* [Native Spring Boot by Alina Yurenko, developer advocate for GraalVM at Oracle](https://github.com/alina-yur/native-spring-boot)
+* [Tiny Java Containers by Shaun Smith](https://github.com/graalvm/graalvm-demos/blob/master/native-image/tiny-java-containers/README.md)
+* [Paketo Buildpacks Spring Boot Native Image Sample](https://github.com/paketo-buildpacks/samples/blob/main/java/native-image/spring-boot-native-image-gradle/README.md)
